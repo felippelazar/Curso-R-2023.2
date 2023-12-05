@@ -7,7 +7,6 @@
 # Para realizar uma condição, é necessário saber os operadores lógicos que são utilizados no R
 
 # 2.1 Operadores Lógicos
-1 + 1
 
 # 2.2 Condição If/Else
 
