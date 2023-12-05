@@ -15,7 +15,3 @@
 # 2.4 Criação de Funções
 
 # 2.5 Funções do Grupo 'Apply' (sapply e lapply)
-
-
-
-dasdasdas
