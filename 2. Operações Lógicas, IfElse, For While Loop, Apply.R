@@ -1,5 +1,5 @@
 # ============================================================================ #
-# 2. Operações Lógicas, If-Else, For Loops, While Loops, Funções e Apply       #
+# 2. Operações Lógicas, If-Else, For Loops, Funções e Apply       #
 # Autor: Felippe Lazar Neto, 2023-2                                            #
 # ============================================================================ #
 
@@ -7,123 +7,147 @@
 # Para realizar uma condição, é necessário saber os operadores lógicos que são utilizados no R
 
 # 2.1 Operadores Lógicos
-num <- 5
+num <- 5 # Assinalando valor de 5 para a variável 'num' que será utilizada após para testar condições
 
-# Vetores Unicos
-num > 10
-num >= 5
-num == 5
-num != 5
+## Comparações de vetores únicos em que o resultado é um vetor único
+num > 10 # '>' maior a
+num >= 5 # '>=' maior ou igual a
+num == 5 # '==' igual a
+num != 5 # '!=' diferente de
 
-# Condição de Objeto E dentro de Objeto D
-num %in% 1:10
+## Condição de checagem de objeto dentro de um outro vetor
+num %in% 1:10 # condição: objeto 'num' está dentro do vetor c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 
-# Vetores com > 1 elemento
-num > 1:10
-1:10 > num
+## Comparações com vetores de > 1 elemento (ou comparador, ou o próprio objeto)
+## Resultado será do tamanho do vetor de maior elemento
+num > 1:10 # objeto num maior que c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+1:10 > num # c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10) maior que objeto num 
+# NOTA: O vetor resultante será sempre do valor do objeto de maior valor nessas comparações mais simples
 
-# Comparando mais de uma condição
-num > 2 & num < 10 # & ('E')
-num > 2 | num > 10 # | ('OU')
+## Comparações de Condições ('E') ou ('|')
+num > 2 & num < 10 # & ('E') - resultado é a combinação das duas condições (ambas devem ser verdadeiras)
+num > 2 | num > 10 # | ('OU') - resultado é a combinação de uma ou outra condição (apenas uma precisa ser verdadeira)
 
-# Condição Oposta
-!(num > 1:10) # ! = Oposto da Condições que foi Realizada
+## Condição de vetor único para múltiplas comparações (função any ou all)
+num > 1:10 # objeto num > 1:10 terá como resultado vetor de 10 elementos
+any(num > 1:10)  # condição para checar se pelo menos uma das comparações ('any') é verdadeira
+all(num > 1:10)  # condição para checar se todas as condições são verdadeiras ('all')
 
-# Funções All ou Any
-num > 1:10
-any(num > 1:10) 
-all(num > 1:10) 
-!any(num > 1:10) # !any = todos serem falsos
-!all(num > 1:10) # !all = any (qualquer um verdadeiro)
+## Condição Oposta
+!c(TRUE) # o sinal '!' inverte o valor booleano 
+!(num > 1:10) # o sinal '!' inverte o valor booleano (único ou múltiplo)
+!any(num > 1:10) # !any = todos serem falsos (inverso do 'any' que seria pelo menos um verdadeiro)
+!all(num > 1:10) # !all = pelo menos um falso
 
-# 2.2 Condição If/Else
-num
-num <- 10
-if(num == 5){ # Condição de resultado único (vetor de único elemento)
+# 2.2 Condição If/Else 
+# São condições muito utilizadas para realizar operações de acordo com condicionais
+# O formato padrão é: if(condição){operação caso satisfeita}else{operação caso condição não satisfeita}
+num <- 10 # assinalando o valor de 10 ao objeto 'num'
+
+if(num == 5){ # Se valor do objeto num for igual a 5, print 'O número é 5', caso contrário, print 'O número não é 5'.
       
-      print('O número é 5')
+  print('O número é 5')
       
 }else{
-      print('O número não é 5')
       
+  print('O número não é 5')
 }
 
+# Pode havar mais de uma condição com o uso do else if. Apenas a primeira condição satisfeita é a realizada (!!)
 if(num == 5){
       
-      print('O número é 5')
-      
+  print('O número é 5')
+  
 }else if(num > 1){
       
-      print('O número é maior do que 1')
+  print('O número é maior do que 1')
       
 }else{
       
-      print('O número não é 5')
-      
+  print('O número não é 5')
+  
 }
 
-# 2.3 For Looping - Iteração
-obj_um_a_dez <- 1:10
+# 2.3 For Looping - Iteração entre elementos de um vetor, lista, ou data-frame (no caso de data-frame, colunas)
+obj_um_a_dez <- 1:10 # criação de um vetor único de obj de 1 a 10
 
-for(elemento in obj_um_a_dez){
+# No exemplo a seguir, o for looping vai iterar de 1 a 10 (vetor 1:10) e criar um objeto temporário chamado elemento
+# em cada iteração. Ele então irá realizar as ações que estipularmos dentro do looping com o objeto.
+
+for(elemento in obj_um_a_dez){ # Início da iteração de cada um dos elementos de 1 a 10. 
+                               # Reparem que precisamos nomear o objeto temporário da iteração (no caso, 'elemento')
       print(elemento) # 1 coisa é printar o valor do elemento
       
-      if(elemento < 5){
-            print('Menor do que 5')
+      if(elemento < 5){ # Podemos colocar dentro desse 'looping' condições que nos interessem
+        
+            print('Menor do que 5') # Nesse caso, se o elemento de iteração for mentor que 5, ele print a mensagem 'Menor que 5'
+        
       }
 
 }
 
-lista_random <- list(sample(1:100, 10), sample(1:100, 10), sample(1:100, 10))
+# Nesse próximo exemplo iremos iterar sobre uma lista de três elementos (três vetores randomicos de 10 elementos)
+lista_random <- list(sample(1:100, 10), sample(1:100, 10), sample(1:100, 10)) # criação da lista
 
+# Para cada elemento da lista, assinalaremos o objeto 'elemento_lista' o qual printaremos o valor 
+# e printaremos quantos são maior que 20 (a partir da soma do resultado de uma condição)
 for(elemento_lista in lista_random){
       print(elemento_lista)
       print(sum(elemento_lista > 20))
 }
 
-# Criar uma Lista
-lista_mega_sena <- list()
+# No próximo exemplo criaremos uma lista com elementos que correspondem a jogos da mega-sena (6 números, de 1 a 60)
+lista_mega_sena <- list() # criando uma lista VAZIA que preencheremos com o código
 
-# Iteração para Criar um Objeto
-for(i in 1:100){
-      lista_mega_sena[[i]] <- sample(1:60, 6)
+# Criamos o objeto de iteração no momento do próprio looping
+for(i in 1:100){ # o elemento temporário daremos o nome de 'i' (poderia ser qualquer coisa)
+      lista_mega_sena[[i]] <- sample(1:60, 6) # para cada número 'i', ele criará uma lista com indexador de número 'i' com um jogo da mega-sena
 }
 
-lista_mega_sena
+lista_mega_sena # resultado da lista com 100 jogos da mega-sena que criamos
 
-resultado_mega <- sample(1:60, 6)
+# No próximo exemplo compararemos o valor dos jogos criados com um resultado aleatório
+resultado_mega <- sample(1:60, 6) # criação de resultado aleatório único
 
-for(jogos in lista_mega_sena){
-      print(sum(jogos %in% resultado_mega))
-      if(sum(jogos %in% resultado_mega) >= 1){
-            print('Parabéns, você acertou algum dos jogos')
+for(jogos in lista_mega_sena){ # elemento temporário chamado de 'jogos'
+      print(sum(jogos %in% resultado_mega)) # comparação de quantos acertos houve nesse jogos comparado ao resultado
+      if(sum(jogos %in% resultado_mega) >= 1){ # condição se o jogo havia pelo menos um acerto
+            print('Parabéns, você acertou algum dos jogos') # caso >= 1 acerto, print mensagem 'Parabéns, você acertou algum dos jogos'
       }
 }
 
 # 2.4 Criação de Funções
-calc_imc <- function(peso, alt){
+# Funções são muito importantes para nos ajudar a determinar certos valores
+# O modelo básico de função é: function(argumentos){função propriamente dita a partir dos elementos}
+calc_imc <- function(peso, alt){ # função para cálculo do IMC a partir do peso e altura
       imc <- peso/(alt*alt)
       return(imc)
 }
 
-imc <- calc_imc(60, 1.65)
-peso <- sample(50:90, 10)
-alt <- sample(150:200, 10)/100
+imc <- calc_imc(60, 1.65) # cálculo do IMC de um peso de 60kg e altura de 1,65m
+peso <- sample(50:90, 10) # criação de pesos aleatórios
+alt <- sample(150:200, 10)/100 # criação de alturas aleatórias
 
-calc_imc(peso, alt)
+calc_imc(peso, alt) # cálculo de elemento IMC com dez números (a partir de 10 pesos e 10 alturas)
 
 # 2.5 Funções do Grupo 'Apply' (sapply e lapply)
-df_peso_alt <- as.data.frame(cbind(peso, alt))
-class(cbind(peso, alt))
+# Funções mais avanaçadas, que basicamente são 'for' looping de maneira simplificada
+df_peso_alt <- as.data.frame(cbind(peso, alt)) # Criação de um dataframe basico com peso e altura (duas colunas)
+class(cbind(peso, alt)) # Checagem do tipo ('dataframe')
 
-obj_lapply <- lapply(df_peso_alt, mean)
-obj_sapply <- sapply(df_peso_alt, mean)
-class(obj_lapply)
-class(obj_sapply)
+obj_lapply <- lapply(df_peso_alt, mean) # média para cada coluna de um data-frame (for looping for coluna) - resultado em lista (!!)
+obj_sapply <- sapply(df_peso_alt, mean) # mesmo resultado anterior, só que em vetor (e não lista)
+class(obj_lapply) # classe do objeto - lista
+class(obj_sapply) # classe do objeto - vetor
 
+# Exemplo da facilidade do for looping e apply
+# Exemplo com for looping
 for(i in 1:100){
       lista_mega_sena[[i]] <- sample(1:60, 6)
 }
-
+# Exemplo com apply
+# IMPORTANTE: reparem que defini (criei) uma função dentro do próprio apply por meio de: function(x){}
+# Reparem também coloquei um argumento x na função que não utilizei para nada (o resultado da função não depende de X)
+# Isso foi utilizado para criar um processo de iteração parecido com o anterior. 
 lapply(1:100, function(x) sample(1:60, 6))
 
