@@ -7,10 +7,11 @@
 getwd()
 
 # Opening Packages
+# https://r4ds.had.co.nz/ (R for Data Science)
 library(tidyverse)
 
 # Loading data-frames
-dfb <- read.table(file = 'datasets/acmg/acmg_sample_csv_example.csv', sep = ',', header = TRUE,  # Header = Se a 1L são os nomes das colunas
+dfb <- read.table(file = 'datasets/acmg/acmg_sample_sociodem.csv', sep = ',', header = TRUE,  # Header = Se a 1L são os nomes das colunas
                       stringsAsFactors = FALSE, na.strings = c('')) # StringAsFactors = argumento para definir todos strings (character) como fator
 
 # 1. Select
