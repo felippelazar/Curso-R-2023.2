@@ -14,9 +14,16 @@ dfb <- read.table(file = 'datasets/acmg/acmg_sample_sociodem.csv', sep = ',', he
 df_lab <- read.table(file = 'datasets/acmg/acmg_sample_lab.csv', sep = ',', header = TRUE,  # Header = Se a 1L são os nomes das colunas
                      stringsAsFactors = FALSE, na.strings = c('', 'NA')) # StringAsFactors = argumento para definir todos strings (character) como fator
 
+df_lab_wide <- df_lab %>%
+      pivot_wider(id_cols = c('ID'), names_from = 'LAB.NOME', values_from = 'LAB.RESULTADO')
+
 # Carregando sinais vitais
 df_ssvv <- read.table(file = 'datasets/acmg/acmg_sample_ssvv.csv', sep = ',', header = TRUE,  # Header = Se a 1L são os nomes das colunas
                       stringsAsFactors = FALSE, na.strings = c('', 'NA')) # StringAsFactors = argumento para definir todos strings (character) como fator
+
+# Carregando Comorbidades
+df_comorb <- read.table(file = 'datasets/acmg/acmg_sample_comorb.csv', sep = ',', header = TRUE,  # Header = Se a 1L são os nomes das colunas
+                        stringsAsFactors = FALSE, na.strings = c('', 'NA')) # StringAsFactors = argumento para definir todos strings (character) como fator
 
 # Juntando as três data-frames
 
