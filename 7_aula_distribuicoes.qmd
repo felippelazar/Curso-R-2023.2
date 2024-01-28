@@ -1,0 +1,449 @@
+---
+title: "Distribuições Comuns e Distribuição da Média"
+author: 'Felippe Lazar Neto'
+format: 
+      revealjs:
+            theme: default
+            slide-number: c/t
+            show-slide-number: all
+editor: visual
+---
+
+## Objetivo
+
+-   Entender os principais tipos de distribuição estatística assim como as suas principais implicações
+
+## Distribuição Normal
+
+- Uma das distribuições mais importantes da estatística
+- Para se dizer que uma variável segue a distribuição normal, é preciso que ela apresente uma médian $\mu$ e variância $\sigma^2$ que sigam a seguinte função de densidade:
+
+ $$
+  (2\pi \sigma^2)^{-1/2}e^{-(x - \mu)^2/2\sigma^2}
+ $$
+
+## Distribuição Normal Padrão
+
+- Quando a $\mu = 0$ e $\sigma = 1$ a distribuição resultante é chamada de **distribuição normal padrão**
+
+```{r}
+#| echo = FALSE
+library(tidyverse)
+library(tigerstats)
+x <- seq(-4, 4, length = 1000)
+g <- ggplot(data.frame(x = x, y = dnorm(x)), aes(x = x, y = y)) + 
+      geom_line(size = 2) + 
+      geom_vline(xintercept = -3 : 3, size = 0.5) + 
+      theme_minimal()
+g
+```
+
+## Distribuição Normal Padrão
+
+- A função de densidade da curva **normal** implica que a densidade (proporção) de observações a 1, 2, 3 desvio-padrões da média sejam equivalentes a 68%, 95% e 99% das observações aproximadamente
+-  $-1.28$, $-1.645$, $-1.96$ e $-2.33$ são equivalentes aos percentis $10^{th}$, $5^{th}$, $2.5^{th}$ and $1^{st}$ respectivamente
+- Por simetria, $1.28$, $1.645$, $1.96$ e $2.33$ são equivalentes aos percentis $90^{th}$, $95^{th}$, $97.5^{th}$  $99^{th}$ respectivamente
+
+## Distribuição Normal Padrão
+
+```{r}
+#| echo = FALSE
+pnormGC(c(-1, 1), region = 'between', graph = TRUE)
+```
+
+## Distribuição Normal Padrão
+
+```{r}
+#| echo = FALSE
+pnormGC(c(-2, 2), region = 'between', graph = TRUE)
+```
+
+## Distribuição Normal em R
+
+```{r}
+#| echo = TRUE
+library(tidyverse)
+# os parâmetros base seguem a normal pad
+# rnorm = geração randômica da distribuição normal
+rnorm(10)
+```
+. . .
+```{r}
+#| echo = TRUE
+# pnorm = probabilidade da distribuição normal de um determinado número
+pnorm(c(1.28, 1.645, 1.96, 2.33))
+```
+. . . 
+```{r}
+#| echo = TRUE
+# qnorm = quantile (percentil) da distribuição normal de uma determinada probabilidade
+qnorm(c(0.90, 0.95, 0.975, 0.99))
+```
+. . . 
+
+## Transformação em Distribuição Normal Padrão
+
+- Para transformar uma variável na distribuição normal padrão, deve-se **subtrair** a média de cada observação e dividir pelo **desvio padrão** (*normalização* de uma variável)
+- Também chamado de **Z-score**
+
+```{r}
+#| echo = FALSE
+library(tidyverse)
+df <- read.table(file = 'datasets/acmg/acmg_sample_all_vars.csv', 
+                  sep = ',', 
+                  header = TRUE,
+                  stringsAsFactors = FALSE, 
+                  na.strings = c('', 'NA')) 
+```
+
+```{r}
+#| echo = TRUE
+peso_normalizado <- (df$SSVV.PESO - mean(df$SSVV.PESO, na.rm = TRUE))/sd(df$SSVV.PESO, na.rm = TRUE)
+```
+
+## Transformação em Distribuição Normal Padrão
+
+```{r}
+#| echo = FALSE
+hist(peso_normalizado, breaks = 30)
+```
+
+## Teste Estatístico para Distribuição Normal
+
+- Testes que checam a premissa de distribuição normal de uma variável
+- **Shapiro-Wilk** é o teste mais comumente utilizado
+- Apresenta limitações com amostras pequenas (< 30) ou amostras muito grandes 
+- p-valor menor que $0.05$ se rejeita a hipótese nula de que a distribuição é normal
+
+## Teste Estatístico para Distribuição Normal
+```{r}
+#| echo = TRUE
+shapiro.test(df$SSVV.PESO)
+```
+
+. . . 
+
+- Entretanto, muitos pesquisadores acabam definindo se uma variável segue a distribuição normal também pela inspecção do gráfico, e não só pelo teste estatístico
+
+# Outras Distribuições
+
+## Distribuição Uniforme
+
+- Todos valores tem a mesma probabilidade de ocorrência
+- Exemplo discreto: Probabilidade de Dado (Todas são = 1/6)
+$P(x) = \frac{1}{x}$
+
+## Distribuição Uniforme
+
+```{r}
+dado <- c(1, 2, 3, 4, 5, 6)
+sample_dado <- sample(dado, 10000, replace = TRUE)
+hist(sample_dado, breaks = 8)
+```
+
+## Distribuição de Bernoulli
+
+- Variáveis que resultam de uma resultado binário (1 = Sucesso, 0 = Fracasso)
+- A probabilidade de sucesso é $p$ e por consequência de fracasso de $(1-p)$
+- **Média** = $p$, **Variância** = $p(1 - p)$
+
+$P(X = k) = p^k \cdot (1 - p)^{1-k}$
+
+- p = probabilidade de sucesso
+- k = desfecho (1 = Sucesso, 0 = Fracasso)
+
+## Distribuição de Bernoulli
+
+- Exemplo: A probabilidade de chuva é de 75% (1 = chuva, 0 = sem chuva)
+- Logo, para o desfecho chuva: $0.75^1\cdot(1-0.75)^0$ que é igual a 75%
+- Para o desfecho não chuva: $0.75^0\cdot(1-0.75)^1$ que é igual a 25%
+
+## Distribuição Binomial
+
+- Distribuição que ocorre quando há (n > 1) repetições independentes de Bernoulli e a probabilidade se mantém constante
+
+$$
+P(X = x) = 
+\left(
+\begin{array}{c}
+  n \\ x
+\end{array}
+\right)
+p^x(1 - p)^{n-x}
+$$
+
+## Distribuição Binomial
+
+- Exemplo: Cálculo da probabilidade que um casal tenha 2 de 8 filhos meninas sabendo que a probabilidade de se ter menino ou menina é de 50%
+
+```{r}
+#| echo = TRUE
+pbinom(2, size = 8, prob = 0.5, lower.tail = FALSE)
+```
+
+## Distribuição Binomial
+
+- Exemplo: Cálculo da probabilidade que um casal tenha 2 de 8 filhos meninas sabendo que a probabilidade de se ter menino ou menina é de 50%
+
+```{r}
+pbinomGC(bound = 2, region = 'above', 
+         size = 8, prob = 0.5, graph = TRUE)
+```
+
+## Distribuição de Poisson
+
+- A distribuição de Poisson determina o número de eventos dado uma exposição contínua (rate)
+- k = número de eventos (não negativos)
+- $\lambda$ = número de eventos esperados por unidade de tempo
+- **Média** = $\lambda$, **Variância** = $\lambda$
+
+$P(X = k) = \frac{e^{-\lambda} \lambda^k}{k!}$
+
+## Distribuição de Poisson
+
+- Exemplo: Um médico recebe 3 emails/hora. Qual a probabilidade de ele receber 10 emails em 2 horas?
+
+```{r}
+#| echo = TRUE
+ppois(10, lambda = 3*2, lower.tail = FALSE)
+```
+
+## Distribuição de Poisson
+
+```{r}
+#| echo = TRUE
+x <- seq(0, 15)
+g <- ggplot(data.frame(x = x, y = dpois(x, lambda = 3*2)), 
+            aes(x = x, y = y)) + 
+      geom_line(size = 2) + 
+      geom_vline(xintercept = 10, size = 0.5) + 
+      theme_minimal()
+g
+```
+
+## Comportamento Assintótico
+
+- Comportamento de uma função ou distribuição à medida que uma variável se aproxima de um valor extremo, como infinito.
+- Lei dos Grandes Números (*Law of Large Numbers*): A medida que o número de elementos (n) aumenta, a média **amostral** se aproxima da média populacional (que estamos tentando estimar)
+
+## Lei dos Grandes Números
+
+- Exemplo: Variável Binária (Sexo)
+```{r}
+#| echo = TRUE
+sexo_bin = ifelse(df$SEXO == 'FEMININO', 1, 0)
+mean(sexo_bin, na.rm = T)
+```
+## Lei dos Grandes Números
+
+- Exemplo: Variável Binária (Sexo)
+```{r}
+#| echo = TRUE
+medias_sampled <- sapply(10:10000, function(x) mean(sample(sexo_bin, x, replace = TRUE)))
+```
+
+## Lei dos Grandes Números
+
+- Exemplo: Variável Binária (Sexo)
+```{r}
+ggplot(data.frame(n = 10:10000, media = medias_sampled), 
+       aes(x = n, y = media)) +
+      geom_line() + 
+      geom_hline(yintercept = mean(sexo_bin, na.rm = TRUE), color = 'red')
+      
+```
+
+## Lei dos Grandes Números
+
+- Exemplo: Variável Numérica (Peso)
+```{r}
+#| echo = TRUE
+mean(df$SSVV.PESO, na.rm = TRUE)
+medias_sampled <- sapply(10:10000, function(x) mean(sample(df$SSVV.PESO, x, 
+                                                           replace = TRUE), na.rm = TRUE))
+```
+
+## Lei dos Grandes Números
+
+- Exemplo: Variável Numérica (Peso)
+```{r}
+ggplot(data.frame(n = 10:10000, media = medias_sampled), 
+       aes(x = n, y = media)) +
+      geom_line() + 
+      geom_hline(yintercept = mean(df$SSVV.PESO, na.rm = TRUE), color = 'red')
+```
+
+
+## Teorema de Limite Central 
+
+-  A distribuição amostral da média se aproxima de uma distribuição normal, independentemente da forma da distribuição original
+
+$$\frac{\bar X_n - \mu}{\sigma / \sqrt{n}}=
+\frac{\sqrt n (\bar X_n - \mu)}{\sigma}
+= \frac{\mbox{Estimate} - \mbox{Mean of estimate}}{\mbox{Std. Err. of estimate}}$$
+
+- Uma maneira interessante de pensar no TLC é: $\bar X_n$ é aproximadamente
+$N(\mu, \sigma^2 / n)$
+
+## Erro Padrão da Média
+
+O erro padrão da média (SEM) é uma medida da variabilidade da média amostral em relação à média populacional. A fórmula para o SEM é dada por:
+
+$SEM = \frac{s}{\sqrt{n}}$
+
+onde:
+
+- $s$ é o desvio padrão da amostra.
+- $n$ é o tamanho da amostra.
+
+## TLC e Distribuição da Média
+
+- Exemplo Variável Binária
+```{r}
+#| echo = TRUE
+sexo_bin = ifelse(df$SEXO == 'FEMININO', 1, 0)
+mean(sexo_bin, na.rm = T)
+
+mean_10_samples <- sapply(rep(10, 1000), function(x) mean(sample(sexo_bin, x, replace = TRUE)))
+
+mean_20_samples <- sapply(rep(20, 1000), function(x) mean(sample(sexo_bin, x, replace = TRUE)))
+
+mean_30_samples <- sapply(rep(30, 1000), function(x) mean(sample(sexo_bin, x, replace = TRUE)))
+```
+
+## TLC e Distribuição da Média
+
+- Exemplo Variável Binária
+```{r}
+data.frame(mean_10_samples, mean_20_samples, mean_30_samples) %>%
+      pivot_longer(cols = c('mean_10_samples', 'mean_20_samples', 'mean_30_samples'),
+                   names_to = 'number_samples',
+                   values_to = 'mean') %>%
+      ggplot(aes(x = mean, fill = number_samples)) +
+      geom_histogram() + 
+      facet_grid(.~number_samples) +
+      theme(legend.position = 'none')
+```
+
+## TLC e Distribuição da Média
+
+- Exemplo Variável Númerica
+```{r}
+#| echo = TRUE
+peso_clean = df$SSVV.PESO[!is.na(df$SSVV.PESO)]
+mean(peso_clean, na.rm = T)
+
+mean_10_samples <- sapply(rep(10, 1000), function(x) mean(sample(peso_clean, x, replace = TRUE)))
+
+mean_20_samples <- sapply(rep(20, 1000), function(x) mean(sample(peso_clean, x, replace = TRUE)))
+
+mean_30_samples <- sapply(rep(30, 1000), function(x) mean(sample(peso_clean, x, replace = TRUE)))
+```
+
+## TLC e Distribuição da Média
+
+- Exemplo Variável Numérica
+```{r}
+data.frame(mean_10_samples, mean_20_samples, mean_30_samples) %>%
+      pivot_longer(cols = c('mean_10_samples', 'mean_20_samples', 'mean_30_samples'),
+                   names_to = 'number_samples',
+                   values_to = 'mean') %>%
+      ggplot(aes(x = mean, fill = number_samples)) +
+      geom_histogram() + 
+      facet_grid(.~number_samples) + 
+      theme(legend.position = 'none')
+```
+
+## TLC e Distribuição da Média
+
+- Exemplo Variável Discreta Númerica
+```{r}
+#| echo = TRUE
+dado = 1:6
+mean(dado, na.rm = T)
+
+mean_10_samples <- sapply(rep(10, 1000), function(x) mean(sample(dado, x, replace = TRUE)))
+
+mean_20_samples <- sapply(rep(20, 1000), function(x) mean(sample(dado, x, replace = TRUE)))
+
+mean_30_samples <- sapply(rep(30, 1000), function(x) mean(sample(dado, x, replace = TRUE)))
+```
+
+## TLC e Distribuição da Média
+
+- Exemplo Variável Discreta Númerica
+```{r}
+data.frame(mean_10_samples, mean_20_samples, mean_30_samples) %>%
+      pivot_longer(cols = c('mean_10_samples', 'mean_20_samples', 'mean_30_samples'),
+                   names_to = 'number_samples',
+                   values_to = 'mean') %>%
+      ggplot(aes(x = mean, fill = number_samples)) +
+      geom_histogram() + 
+      facet_grid(.~number_samples) + 
+      theme(legend.position = 'none')
+```
+
+## Intervalos de Confiança da Média
+
+- De acordo com o TCL, a média amostral $\bar X$, 
+é aproximadamente normal com média $\mu$ e desvio padrão $\sigma / \sqrt{n}$
+- Portanto, a probabilidade de $\bar X$ ser maior que $\mu + 2 \sigma / \sqrt{n}$
+ou menor que $\mu - 2 \sigma / \sqrt{n}$ é 5%
+- Ou equivalente, a probabilidade de estar nesses limites é 95%
+- $\bar X \pm 2 \sigma /\sqrt{n}$ é chamado de 95% intervalo para $\mu$
+
+## Intervalos de Confiança da Média
+- Os 95% referem-se ao fato de que se repetíssemos a amostragem de tamanho $n$, aproximadamente 95% dos intervalos conteriam o valor $\mu$
+
+## Intervalo Confiança Média
+
+- Variável Numérica
+
+```{r}
+#| echo = TRUE
+mean <- mean(df$SSVV.PESO, na.rm = T) 
+
+conf.high <- mean(df$SSVV.PESO, na.rm = T) + 1.96*sd(df$SSVV.PESO, na.rm = T)/sqrt(sum(!is.na(df$SSVV.PESO)))
+
+conf.low <- mean(df$SSVV.PESO, na.rm = T) - 1.96*sd(df$SSVV.PESO, na.rm = T)/sqrt(sum(!is.na(df$SSVV.PESO)))
+
+paste(round(mean, 2), '(', round(conf.high, 2), '-', round(conf.low, 2), ')')
+```
+
+## Intervalo Confiança Média
+
+- Variável Binomial
+
+```{r}
+#| echo = TRUE
+mean <- mean(sexo_bin, na.rm = T) 
+
+conf.high <- mean(sexo_bin, na.rm = T) + 1.96*sd(sexo_bin, na.rm = T)/sqrt(sum(!is.na(sexo_bin)))
+
+conf.low <- mean(sexo_bin, na.rm = T) - 1.96*sd(sexo_bin, na.rm = T)/sqrt(sum(!is.na(sexo_bin)))
+
+paste(round(mean, 2), '(', round(conf.low, 2), '-', round(conf.high, 2), ')')
+
+round(binom.test(193, 300)$conf.int[1:2], 2)
+```
+
+## Intervalo Confiança Média
+
+- No caso da variável binária, o IC 95% seria construído pela fórmula: 
+$$
+    \hat p \pm z_{1 - \alpha/2}  \sqrt{\frac{p(1 - p)}{n}}
+$$
+- Substituindo $p$ por $\hat p$ no erro padrão resulta no que é chamado de intervalo de confiança de Wald para $p$
+
+## Intervalo Confiança Média
+
+- A seguinte fórmula é uma estimativa rápida do intervalo de confiança 95%: 
+$$\hat p \pm \frac{1}{\sqrt{n}}$$ 
+
+# Obrigado
+
+## Referências
+-   Coursera Data Science Specialization JHU - link\[https://www.coursera.org/specializations/jhu-data-science\]
+-   Fávero, Luiz Paulo, and Patrícia Belfiore. Manual de análise de dados: estatística e modelagem multivariada com Excel®, SPSS® e Stata®. Elsevier Brasil, 2017.
+-   FMM5003 - Princípios de Análise de Dados e de Bioestatística (2023) - Dr. Luiz
+
