@@ -40,9 +40,7 @@ df <- read.table(file = 'datasets/acmg/acmg_sample_all_vars.csv',
 ## Estimativas
 
 -   A razão de chances (*odds ratio*) super-estima a magnitude da associação quando comparado ao risco relativo para desfechos frequentes (comuns)
--   Exemplo: Dados. Qual a chance de tirar um 6?
--   RR = 1/6 (16%)
--   RC (OR) = 1/6 / 5/6 = 1/5 (20%)
+
 
 ## Teste de Hipótese
 
@@ -136,12 +134,23 @@ chisq.test(df$SEXO, df$COMORB.DIABETES2, correct = FALSE)
 ## Teste Exato de Fisher
 
 - Aplicação em situações em que pelo menos uma das células tem menos de 5 observações
+- Aplicação de cálculo hipergeométrico para definição de proporções esperadas extremas
 
 ## Teste Exato de Fisher
 ```{r}
 #| echo = TRUE
 fisher.test(df$SEXO, df$COMORB.DIABETES2)
 ```
+
+## Amostras Pareadas
+
+- Para amostras pareadas, pode-se usar o teste de McNemar (mcnemar.test no R)
+
+## Conclusões
+
+- Avaliação de diferenças entre variáveis categóricas são frequentas na literatura biomédica
+- Entender o conceito por trás do teste chi-quadrado é fundamental para entender sua interpretação
+- O teste qui-quadrado é inadequado em situações em que uma ou mais células da matrix apresentam um valor menor que 5, sendo o teste de Fisher mais adequado nesse contexto
 
 ## Referências
 

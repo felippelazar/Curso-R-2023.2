@@ -29,6 +29,71 @@
       margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
       vertical-align: middle;
     }
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
   <link rel="stylesheet" href="9_aula_diferencas_proporcoes_files/libs/revealjs/dist/theme/quarto.css">
   <link href="9_aula_diferencas_proporcoes_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
@@ -379,9 +444,6 @@ Felippe Lazar Neto
 <h2>Estimativas</h2>
 <ul>
 <li>A razão de chances (<em>odds ratio</em>) super-estima a magnitude da associação quando comparado ao risco relativo para desfechos frequentes (comuns)</li>
-<li>Exemplo: Dados. Qual a chance de tirar um 6?</li>
-<li>RR = 1/6 (16%)</li>
-<li>RC (OR) = 1/6 / 5/6 = 1/5 (20%)</li>
 </ul>
 </section>
 <section id="teste-de-hipótese" class="slide level2">
@@ -579,18 +641,81 @@ Felippe Lazar Neto
 </tbody>
 </table>
 </section>
-<section>
-<section id="exemplo-de-cálculo-5" class="title-slide slide level1 center">
-<h1>Exemplo de Cálculo</h1>
+<section id="exemplo-de-cálculo-5" class="slide level2">
+<h2>Exemplo de Cálculo</h2>
 <ul>
 <li>Esse valoor encontrado de qui-quadrado será comparado a distribuição de qui-quadrado, levando em consideração o número de graus de liberdade</li>
 <li>O número de graus de liberdade é calculado pela conta: (números de linhas - 1)*(número de colunas -1)</li>
 <li>Nesse exemplo, seria igual a (2-1)*(2-1) = 1</li>
 </ul>
 </section>
-<section id="teste-de-chi-quadrado-no-r" class="slide level2">
-<h2>Teste de Chi-quadrado no R</h2>
-<p>[chi-square table][Figuras/chisquare_table.jpeg]</p>
+<section id="comparação-em-relação-a-curva" class="slide level2">
+<h2>Comparação em Relação a Curva</h2>
+
+<img data-src="Figuras/chisquare_curve.png" class="r-stretch quarto-figure-center"><p class="caption">https://www.scribbr.com/statistics/chi-square-distributions/</p></section>
+<section id="comparação-em-relação-a-curva-1" class="slide level2">
+<h2>Comparação em Relação a Curva</h2>
+<p><img data-src="Figuras/chisquare_table.png" alt="https://www.researchgate.net/figure/Chi-square-Distribution-Table_fig6_350802321"> ## Teste de Qui-Quadrado</p>
+<ul>
+<li>No R, o código é simples e os argumentos são as variáveis a serem comparadas.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">chisq.test</span>(df<span class="sc">$</span>SEXO, df<span class="sc">$</span>COMORB.DIABETES2, <span class="at">correct =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Pearson's Chi-squared test
+
+data:  df$SEXO and df$COMORB.DIABETES2
+X-squared = 0.36318, df = 1, p-value = 0.5467</code></pre>
+</div>
+</div>
+</section>
+<section id="teste-de-qui-quadrado-1" class="slide level2">
+<h2>Teste de Qui-Quadrado</h2>
+<ul>
+<li>Não deve ser utilizado quando o número total é menor que 20 ou o número por ‘célula’ é menor que 5</li>
+<li>Nessas circunstâncias o teste exato de Fisher é melhor aplicado</li>
+</ul>
+</section>
+<section id="teste-exato-de-fisher" class="slide level2">
+<h2>Teste Exato de Fisher</h2>
+<ul>
+<li>Aplicação em situações em que pelo menos uma das células tem menos de 5 observações</li>
+<li>Aplicação de cálculo hipergeométrico para definição de proporções esperadas extremas</li>
+</ul>
+</section>
+<section id="teste-exato-de-fisher-1" class="slide level2">
+<h2>Teste Exato de Fisher</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">fisher.test</span>(df<span class="sc">$</span>SEXO, df<span class="sc">$</span>COMORB.DIABETES2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Fisher's Exact Test for Count Data
+
+data:  df$SEXO and df$COMORB.DIABETES2
+p-value = 0.6298
+alternative hypothesis: true odds ratio is not equal to 1
+95 percent confidence interval:
+ 0.7012219 1.9082872
+sample estimates:
+odds ratio 
+  1.155882 </code></pre>
+</div>
+</div>
+</section>
+<section id="amostras-pareadas" class="slide level2">
+<h2>Amostras Pareadas</h2>
+<ul>
+<li>Para amostras pareadas, pode-se usar o teste de McNemar (mcnemar.test no R)</li>
+</ul>
+</section>
+<section id="conclusões" class="slide level2">
+<h2>Conclusões</h2>
+<ul>
+<li>Avaliação de diferenças entre variáveis categóricas são frequentas na literatura biomédica</li>
+<li>Entender o conceito por trás do teste chi-quadrado é fundamental para entender sua interpretação</li>
+<li>O teste qui-quadrado é inadequado em situações em que uma ou mais células da matrix apresentam um valor menor que 5, sendo o teste de Fisher mais adequado nesse contexto</li>
+</ul>
 </section>
 <section id="referências" class="slide level2">
 <h2>Referências</h2>
@@ -602,7 +727,7 @@ Felippe Lazar Neto
 <div class="footer footer-default">
 
 </div>
-</section></section>
+</section>
     </div>
   </div>
 
