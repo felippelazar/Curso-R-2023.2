@@ -1,0 +1,443 @@
+---
+title: "Análise Descritiva e Tipo de Variáveis"
+author: 'Felippe Lazar Neto'
+format: 
+      revealjs:
+            theme: default
+            slide-number: c/t
+            show-slide-number: all
+editor: visual
+---
+
+## Disclaimer
+
+-   Não tenho *educação formal* em estatística (sou médico, pesquisador)
+-   Realizo pesquisa científica desde 2011, com aplicação direta de análise estatística desde 2015
+-   Aprendi estatística por meio de diversas fontes, incluindo mais recentemente matérias de pós-graduação
+-   Também sou estudante (atualmente doutorando na USP), também me desenvolvendo e aprendendo mais sobre estatística
+
+## Objetivo
+
+-   Entender os tipos de variáveis e as medidas de tendência central e dispersão
+
+> *"Continuous variables were described with mean, median, standard deviation (SD), or interquartile range (IQR) depending on variable distribution, and categorical variables with absolute numbers and relative proportions"*
+>
+> -- Qualquer Artigo com Análise Descritiva
+
+## Carregando nosso Banco de Dados
+
+```{r}
+#| echo = TRUE
+library(tidyverse)
+df <- read.table(file = 'datasets/acmg/acmg_sample_all_vars.csv', 
+                  sep = ',', 
+                  header = TRUE,
+                  stringsAsFactors = FALSE, 
+                  na.strings = c('', 'NA')) 
+
+# Número de Linhas e Colunas
+cat(' Número de Linhas:', dim(df)[1])
+cat(' Número de Colunas:', dim(df)[2])
+```
+
+## Pacote gtsummary
+
+-   Pacote de R que facilita análises descritivas e comparativas
+-   Produz outputs com capacidade de exportar para Word, HTML ou PDF
+-   Outras opções de pacotes descritivos são: *tableone* e *hmisc* (entre outros)
+-   Mais informações no [site](https://www.danieldsjoberg.com/gtsummary/index.html) do próprio pacote
+
+```{r}
+#| echo = TRUE
+if(!'gtsummary' %in% installed.packages()[, 'Package']){
+      install.packages('gtsummary')}
+
+# Carregando pacote
+library(gtsummary)
+```
+
+## Exemplo Tabela 1
+
+```{r}
+#| echo: true
+#| output-location: slide
+df %>%
+      # Alterando variável de metros para kilometros
+      mutate(GEO.CARRO.DISTANCIA = GEO.CARRO.DISTANCIA/1000) %>%
+      # Selecionando colunas para análise descritiva
+      select(SEXO, ESCOLARIDADE, GEO.CARRO.DISTANCIA, SSVV.PESO) %>%
+      # Executando função de criação de tabela
+      tbl_summary(missing = 'no', # Excluindo missings
+                  # Especificando Estatísticas Descritivas
+                  statistic = list('SSVV.PESO' ~ "{mean} ({sd})",
+                                   'GEO.CARRO.DISTANCIA' ~ "{median} ({p25}-{p75})"),
+                  # Mudando o nome das variáveis
+                  label = list(SEXO ~ 'Sexo',
+                               ESCOLARIDADE ~ 'Escolaridade',
+                               GEO.CARRO.DISTANCIA ~ 'Distância Hospital (km)',
+                               SSVV.PESO ~ 'Peso (kg)')) %>%
+      # Adicionando Título a Tabela
+      modify_caption("**Table 1. Patient Characteristics**")
+```
+
+## Tipos de Variáveis
+
+-   **Qualitativas**: são variáveis geralmente não númericas do tipo categóricas. Podem apresentar-se com dois (binárias) ou mais grupos. Podem apresentar-se como escalas ordinais (Exemplo: faixa de renda, scores/índices)
+-   **Quantitativas**: são variáveis númericas, contínuas (apresentando até valores fracionados) ou discretas (Exemplo: apresentando valores inteiros positivos)
+
+## Apresentação de Variáveis
+
+-   **Qualitativas**: são apresentadas por meio do número e porcentagem sobre o total (% \[n/N\])
+-   **Quantitativas**: são apresentadas por meio de medidas de tendência central e dispersão
+
+## Exemplo Tabela 1
+
+```{r}
+#| echo: false
+#| output-location: slide
+df %>%
+      # Alterando variável de metros para kilometros
+      mutate(GEO.CARRO.DISTANCIA = GEO.CARRO.DISTANCIA/1000) %>%
+      # Selecionando colunas para análise descritiva
+      select(SEXO, ESCOLARIDADE, GEO.CARRO.DISTANCIA, SSVV.PESO) %>%
+      # Executando função de criação de tabela
+      tbl_summary(missing = 'no', # Excluindo missings
+                  # Especificando Estatísticas Descritivas
+                  statistic = list('SSVV.PESO' ~ "{mean} ({sd})",
+                                   'GEO.CARRO.DISTANCIA' ~ "{median} ({p25}-{p75})"),
+                  # Mudando o nome das variáveis
+                  label = list(SEXO ~ 'Sexo',
+                               ESCOLARIDADE ~ 'Escolaridade',
+                               GEO.CARRO.DISTANCIA ~ 'Distância Hospital (km)',
+                               SSVV.PESO ~ 'Peso (kg)')) %>%
+      # Adicionando Título a Tabela
+      modify_caption("**Table 1. Patient Characteristics**")
+```
+
+# Medidas de Tendência Central
+
+## Média
+
+-   É a soma de todos os valores de uma variável dividido pelo número de observações da mesma
+-   É o centro de massa da distribuição da variável
+
+$$
+\bar X = \sum_{i=1}^n x_i p(x_i)
+$$ onde $p(x_i) = 1/n$
+
+## Média
+
+Variável Quantitativa
+
+```{r}
+#| output-location: column
+library(cowplot)
+fig1 <- df %>%
+      ggplot(aes(x = SSVV.PESO)) +
+      geom_histogram(bins = 50) + 
+      geom_vline(xintercept = mean(df$SSVV.PESO, na.rm = TRUE)) + 
+      ggtitle('Peso (kg)') + theme_bw()
+
+fig2 <- df %>%
+      mutate(GEO.CARRO.DISTANCIA = GEO.CARRO.DISTANCIA/1000) %>%
+      ggplot(aes(x = GEO.CARRO.DISTANCIA)) +
+      geom_histogram(bins = 50) + xlim(0, 100) +
+      geom_vline(xintercept = mean(df$GEO.CARRO.DISTANCIA/1000, na.rm = TRUE)) + 
+      ggtitle('Distância Hospital (km)') + theme_bw()
+
+plot_grid(fig1, fig2, nrow = 1, labels = c('A', 'B'))
+
+```
+
+## Média
+
+Variável Binária
+
+```{r}
+df %>%
+      mutate(SEXO = ifelse(SEXO == 'FEMININO', 1, 0)) %>%
+      ggplot(aes(x = SEXO)) +
+      geom_histogram(bins = 50) + 
+      geom_vline(xintercept = mean(df$SEXO == 'FEMININO', na.rm = TRUE)) + 
+      ggtitle('Sexo (0 = Masculino, 1 = Feminino)') + theme_bw() +
+      scale_x_continuous(breaks = summary(as.numeric(df$SEXO == 'FEMININO')) %>% as.vector())
+```
+
+## Mediana
+
+-   É a observação central da distribuição de uma variável ordenada de forma crescente (ou decrescente)
+-   Divide o conjunto de observações em dois grupos de tamanho (número de observações) iguais
+-   Em caso de número par de observações, será a média simples das duas observações mais centrais
+
+. . .
+
+```{r}
+#| echo = TRUE
+# Mediana de um vetor de 1 a 10
+# 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+median(1:10)
+# Mediana de um vetor de 1 a 9
+# 1, 2, 3, 4, 5, 6, 7, 8, 9
+median(1:11)
+```
+
+## Mediana
+
+Variável Quantitativa
+
+```{r}
+#| output-location: column
+library(cowplot)
+fig1 <- df %>%
+      ggplot(aes(x = SSVV.PESO)) +
+      geom_histogram(bins = 50) + 
+      geom_vline(xintercept = median(df$SSVV.PESO, na.rm = TRUE)) + 
+      ggtitle('Peso (kg)') + theme_bw()
+
+fig2 <- df %>%
+      mutate(GEO.CARRO.DISTANCIA = GEO.CARRO.DISTANCIA/1000) %>%
+      ggplot(aes(x = GEO.CARRO.DISTANCIA)) +
+      geom_histogram(bins = 50) + xlim(0, 100) +
+      geom_vline(xintercept = median(df$GEO.CARRO.DISTANCIA/1000, na.rm = TRUE)) + 
+      ggtitle('Distância Hospital (km)') + theme_bw()
+
+plot_grid(fig1, fig2, nrow = 1, labels = c('A', 'B'))
+
+```
+
+## Mediana
+
+Variável Binária
+
+```{r}
+df %>%
+      mutate(SEXO = ifelse(SEXO == 'FEMININO', 1, 0)) %>%
+      ggplot(aes(x = SEXO)) +
+      geom_histogram(bins = 50) + 
+      geom_vline(xintercept = median(df$SEXO == 'FEMININO', na.rm = TRUE)) + 
+      ggtitle('Sexo (0 = Masculino, 1 = Feminino)') + theme_bw() +
+      scale_x_continuous(breaks = summary(as.numeric(df$SEXO == 'FEMININO')) %>% as.vector())
+```
+
+# Medidas de Posição
+
+## Percentil
+
+-   Elementos (valores) da distribuição crescente de uma variável que dividem ela em **100 partes iguais**
+
+```{r}
+#| echo: true
+quantile(0:100, probs = c(0.10, 0.15, 0.20, 0.47, 0.79, 0.82))
+```
+
+## Quartis
+
+-   Elementos (valores) da distribuição crescente de uma variável que dividem ela em **4 partes iguais**
+-   Implicações:
+    -   25% das observações são menores que o 1 quartil (Q1, 25 percentil, *lower quartile*)
+    -   50% das observações são maiores que o 2 quartil (Q2, 50 percentil ou mediana)
+    -   25% das observações são maiores que o 3 quartil (Q3, 75 percentil, *upper quartile*)
+
+## Intervalo Inter-Quartil
+
+-   **Intervalo Inter-Quartil (IQR *Interquartile Range*)**: 50% das observações estão entre o 1 e o 3 quartil (25-75 percentil)
+
+## Outliers
+
+-   Elementos que se encontram:
+    -   1.5x IQR abaixo de Q1
+    -   1.5x IQR acima de Q3
+
+## Medidas de Posição
+
+```{r}
+#| echo: true
+# Calculando Percentis
+summary(df$SSVV.PESO)
+# Limites Outlier
+print((summary(df$SSVV.PESO)['3rd Qu.'] + 1.5*IQR(df$SSVV.PESO, na.rm = TRUE)) %>% unname())
+print((summary(df$SSVV.PESO)['1st Qu.'] - 1.5*IQR(df$SSVV.PESO, na.rm = TRUE)) %>% unname())
+```
+
+. . .
+
+```{r}
+#| echo = TRUE
+# Calculando Percentils
+summary(df$GEO.CARRO.DISTANCIA/1000)
+# Limites Outlier
+print((summary(df$GEO.CARRO.DISTANCIA/1000)['3rd Qu.'] + 1.5*IQR(df$GEO.CARRO.DISTANCIA/1000, na.rm = TRUE)) %>% unname())
+print((summary(df$GEO.CARRO.DISTANCIA/1000)['1st Qu.'] - 1.5*IQR(df$GEO.CARRO.DISTANCIA/1000, na.rm = TRUE)) %>% unname())
+```
+
+## Gráfico de Boxplot
+
+```{r}
+#| output-location: column
+library(cowplot)
+peso_bp <- df %>%
+      ggplot(aes(x = SSVV.PESO)) +
+      geom_boxplot(alpha = 0.8) + 
+      ggtitle('Peso (kg)') + 
+      theme_bw() + 
+      coord_flip()
+
+dist_bp <- df %>%
+      mutate(GEO.CARRO.DISTANCIA = GEO.CARRO.DISTANCIA/1000) %>%
+      ggplot(aes(x = GEO.CARRO.DISTANCIA)) +
+      geom_boxplot(alpha = 0.8) + 
+      xlim(0, 250) +
+      ggtitle('Distância Hospital (km)') + 
+      theme_bw() + 
+      coord_flip()
+
+plot_grid(peso_bp, dist_bp, nrow = 1, labels = c('A', 'B'))
+
+```
+
+# Medidas de Dispersão
+
+## Variância
+
+-   Demonstra a dispersão das observações em torna da **média**
+-   A unidade da variância é a mesma unidade da variável ao quadrado
+-   Para cálculo da variância amostral (e não populacional), se divide o valor por *(N-1)*
+
+$$
+{Var}(X) = \frac{1}{N-1} \sum_{i=1}^{N} (X_i - \bar{X})^2
+$$
+
+## Variância
+
+```{r}
+#| echo: TRUE
+# Calculo Manual
+# Soma da diferença de cada valor em relação a média ao quadrado
+var_peso <- sum((df$SSVV.PESO - mean(df$SSVV.PESO, na.rm = T))**2, na.rm = T)/(sum(!is.na(df$SSVV.PESO))-1)
+print(var_peso)
+
+# Cálculo com Função (função var)
+var(df$SSVV.PESO, na.rm = TRUE)
+```
+
+## Desvio Padrão
+
+-   É a raiz quadrada da variância
+-   Mais interpretável uma vez que apresenta a mesma unidade que a variável original
+
+$$
+\sigma = \sqrt{\text{Var}(X)}
+$$
+
+## Desvio Padrão
+
+```{r}
+#| echo: TRUE
+# Calculo Manual
+sd_peso <- sqrt(var_peso)
+print(sd_peso)
+
+# Cálculo com Função (função var)
+sd(df$SSVV.PESO, na.rm = TRUE)
+```
+
+## Dispersão em Gráficos
+
+```{r}
+#| echo: true
+mean(df$SSVV.PESO, na.rm = TRUE)
+sd(df$SSVV.PESO, na.rm = TRUE)
+```
+
+. . .
+
+```{r}
+library(ggridges)
+data_temp <- do.call(cbind, lapply(seq(10, 35, by = 5), function(x) rnorm(1000, mean = 74, sd = x)))
+colnames(data_temp) <- paste0('sd_', seq(10, 35, by = 5))
+
+data_temp <- data_temp %>%
+      as.data.frame() %>%
+      pivot_longer(cols = everything(), names_to = 'sd_value', values_to = 'n')
+
+data_temp %>%
+      ggplot(aes(x = n, y = sd_value, fill = sd_value)) + 
+      geom_density_ridges(scale = 3) + 
+      ggtitle('Simulações Variável Média = 74 e SD variável')
+```
+
+## Assimetria
+
+-   Grau de simetria entre as metadas de distribuição de uma variável a partir da mediana
+-   Na curva simétria, média = mediana
+
+![https://www.biologyforlife.com/skew.html](Figuras/skew_curves.png)
+
+## Assimetria
+
+-   positivo = números extremos a direita
+-   negativo = números extremos a esquerda
+
+```{r}
+#| echo: true
+library(moments)
+summary(df$SSVV.PESO)
+skewness(df$SSVV.PESO, na.rm = TRUE)
+
+summary(df$GEO.CARRO.DISTANCIA)
+skewness(df$GEO.CARRO.DISTANCIA, na.rm = TRUE)
+```
+
+```{r}
+#| output-location: column
+library(cowplot)
+fig1 <- df %>%
+      ggplot(aes(x = SSVV.PESO)) +
+      geom_histogram(bins = 50) + 
+      ggtitle('Peso (kg)') + theme_bw()
+
+fig2 <- df %>%
+      mutate(GEO.CARRO.DISTANCIA = GEO.CARRO.DISTANCIA/1000) %>%
+      ggplot(aes(x = GEO.CARRO.DISTANCIA)) +
+      geom_histogram(bins = 50) + xlim(0, 100) +
+      ggtitle('Distância Hospital (km)') + theme_bw()
+
+plot_grid(fig1, fig2, nrow = 1, labels = c('A', 'B'))
+```
+
+## Curtose
+
+-   Grau de achatamento da curva (grau de dispersão nos extremos)
+-   Valor de 3 é a referência de uma curva normal
+-   Valores \> 3 mais disperso nos extremos
+-   Valores \< 3 menos disperso nos extremos
+
+```{r}
+#| echo: true
+# Normal Padrão (Referência)
+kurtosis(rnorm(100000, mean = 0, sd = 1))
+
+# Curtose Peso
+kurtosis(df$SSVV.PESO, na.rm = TRUE)
+```
+
+## Curtose
+
+```{r}
+peso_normalizado <- (df$SSVV.PESO - mean(df$SSVV.PESO, na.rm = T))/sd(df$SSVV.PESO, na.rm = TRUE)
+data.frame(standard_normal = rnorm(3000, mean = 0, sd = 1),
+              peso_normal = peso_normalizado) %>%
+      pivot_longer(cols = everything(),
+                   names_to = 'dist',
+                   values_to = 'n') %>%
+      ggplot(aes(x = n, fill = dist)) + 
+      geom_density(alpha = 0.5)
+```
+
+## Referências
+
+-   Coursera Data Science Specialization JHU - link\[https://www.coursera.org/specializations/jhu-data-science\]
+-   Fávero, Luiz Paulo, and Patrícia Belfiore. Manual de análise de dados: estatística e modelagem multivariada com Excel®, SPSS® e Stata®. Elsevier Brasil, 2017.
+-   FMM5003 - Princípios de Análise de Dados e de Bioestatística (2023) - Dr. Luiz
+
+# Obrigado

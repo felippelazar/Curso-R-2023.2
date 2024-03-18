@@ -1,0 +1,150 @@
+---
+title: "Testes de Diferenças de Proporções"
+author: 'Felippe Lazar Neto'
+format: 
+      revealjs:
+            theme: default
+            slide-number: c/t
+            show-slide-number: all
+editor: visual
+---
+
+```{r}
+#| echo = FALSE
+library(tidyverse)
+df <- read.table(file = 'datasets/acmg/acmg_sample_all_vars.csv', 
+                  sep = ',', 
+                  header = TRUE,
+                  stringsAsFactors = FALSE, 
+                  na.strings = c('', 'NA')) 
+```
+
+## Objetivo
+
+-   Entender quando aplicar diferenças de proporções
+-   Entender quais testes aplicar em cada cenário
+
+## Matriz de Variáveis Categóricas
+
+|            | Evento | Não-Evento |
+|:----------:|:------:|:----------:|
+| Tratamento |   a    |     b      |
+|  Controle  |   c    |     d      |
+
+## Estimativas
+
+-   **Risco Relativo**: (a/(a+b))/(c(c+d))
+-   **Razão de Chances**: (a/b/(c/d)
+-   **Diferença de Risco**: (a/(a+b)) - (c(c+d))
+
+## Estimativas
+
+-   A razão de chances (*odds ratio*) super-estima a magnitude da associação quando comparado ao risco relativo para desfechos frequentes (comuns)
+-   Exemplo: Dados. Qual a chance de tirar um 6?
+-   RR = 1/6 (16%)
+-   RC (OR) = 1/6 / 5/6 = 1/5 (20%)
+
+## Teste de Hipótese
+
+-   As diferenças dos testes de proporção se baseiam na avaliação da proporção encontrada sobre a proporção esperada para uma determinada matrix de duas variáveis categóricas
+-   A principal distribuição que se baseia essa diferença de proporção é a do qui-quadrado
+-   A distribuição do qui-quadrado depende do número de graus de liberdade (associado ao número de categorias de cada variável)
+
+## Teste de Qui-quadrado
+
+-   Avalia a diferença de proporção entre duas variáveis categóricas
+-   Compara a diferença esperada com a diferença observada
+
+## Exemplo de Cálculo
+
+-   Testar se há diferença na proporção de pessoas que tem DM2 (sim/não) por sexo (masc/fem)
+
+|         | Feminino | Masculino |     |
+|---------|:--------:|:---------:|:---:|
+| Não-DM2 |    99    |    51     | 150 |
+| DM2     |    94    |    56     | 150 |
+|         |   193    |    107    | 300 |
+
+## Exemplo de Cálculo
+
+-   O valor esperado é a somatória da diferença ao quadrado entre as proporções esperadas e encontradas
+-   A frequência esperada é igual ao somatório da linha vezes o somatório da coluna dividido pelo total
+
+|         |   Feminino   |  Masculino   |     |
+|---------|:------------:|:------------:|:---:|
+| Não-DM2 | 193\*150/300 | 150\*107/300 | 150 |
+| DM2     | 193\*150/300 | 150\*107/300 | 150 |
+|         |     193      |     107      | 300 |
+
+## Exemplo de Cálculo
+
+-   O valor esperado é a somatória da diferença ao quadrado entre as proporções esperadas e encontradas
+-   A frequência esperada é igual ao somatório da linha vezes o somatório da coluna dividido pelo total
+
+|         | Feminino | Masculino |     |
+|---------|:--------:|:---------:|:---:|
+| Não-DM2 |   96.5   |   53.5    | 150 |
+| DM2     |   96.5   |   53.5    | 150 |
+|         |   193    |    107    | 300 |
+
+## Exemplo de Cálculo
+
+|         |      Feminino       |     Masculino     |     |
+|---------|:-------------------:|:-----------------:|:---:|
+| Não-DM2 | (99 - 96.5)\^2/96.5 | (51-53.5)\^2/53.5 | 150 |
+| DM2     | (99 - 96.5)\^2/96.5 | (51-53.5)\^2/53.5 | 150 |
+|         |         193         |        107        | 300 |
+
+## Exemplo de Cálculo
+
+- Valor de qui-quadrado é igual a soma (0.064 + 0.064 + 0.11 + 0.11)
+- Valor de qui-quadrado = 0.34 (aproximadamente)
+
+|         | Feminino  | Masculino |     |
+|---------|:---------:|:---------:|:---:|
+| Não-DM2 | 6.25/96.5 | 6.25/53.5 | 150 |
+| DM2     | 6.25/96.5 | 6.25/53.5 | 150 |
+|         |    193    |    107    | 300 |
+
+## Exemplo de Cálculo
+
+- Esse valoor encontrado de qui-quadrado será comparado a distribuição de qui-quadrado, levando em consideração o número de graus de liberdade
+- O número de graus de liberdade é calculado pela conta: (números de linhas - 1)*(número de colunas -1)
+- Nesse exemplo, seria igual a (2-1)*(2-1) = 1
+
+## Comparação em Relação a Curva
+
+![https://www.scribbr.com/statistics/chi-square-distributions/](Figuras/chisquare_curve.png)
+
+## Comparação em Relação a Curva
+
+![https://www.researchgate.net/figure/Chi-square-Distribution-Table_fig6_350802321](Figuras/chisquare_table.png)
+## Teste de Qui-Quadrado
+
+- No R, o código é simples e os argumentos são as variáveis a serem comparadas.
+
+```{r}
+#| echo = TRUE
+chisq.test(df$SEXO, df$COMORB.DIABETES2, correct = FALSE)
+```
+
+## Teste de Qui-Quadrado
+
+- Não deve ser utilizado quando o número total é menor que 20 ou o número por 'célula' é menor que 5
+- Nessas circunstâncias o teste exato de Fisher é melhor aplicado
+
+## Teste Exato de Fisher
+
+- Aplicação em situações em que pelo menos uma das células tem menos de 5 observações
+
+## Teste Exato de Fisher
+```{r}
+#| echo = TRUE
+fisher.test(df$SEXO, df$COMORB.DIABETES2)
+```
+
+## Referências
+
+-   Coursera Data Science Specialization JHU - link\[https://www.coursera.org/specializations/jhu-data-science\]
+-   Fávero, Luiz Paulo, and Patrícia Belfiore. Manual de análise de dados: estatística e modelagem multivariada com Excel®, SPSS® e Stata®. Elsevier Brasil, 2017.
+-   FMM5003 - Princípios de Análise de Dados e de Bioestatística (2023) - Dr. Luiz

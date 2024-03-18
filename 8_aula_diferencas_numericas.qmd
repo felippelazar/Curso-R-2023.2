@@ -1,0 +1,261 @@
+---
+title: "Testes de Hipóteses e Diferenças Numéricas"
+author: 'Felippe Lazar Neto'
+format: 
+      revealjs:
+            theme: default
+            slide-number: c/t
+            show-slide-number: all
+editor: visual
+---
+
+```{r}
+#| echo = FALSE
+library(tidyverse)
+df <- read.table(file = 'datasets/acmg/acmg_sample_all_vars.csv', 
+                  sep = ',', 
+                  header = TRUE,
+                  stringsAsFactors = FALSE, 
+                  na.strings = c('', 'NA')) 
+```
+
+## Objetivo
+
+- Entender a importância de formulação de hipóteses e como testá-las
+-   Entender quando aplicar os testes estatísticos mais adequados para cada tipo de amostra
+
+## Teste de Hipóteses
+
+- O estabelecimento de hipóteses está relacionado a tomada de decisões sobre dados
+- A **hipótese nula** refere-se a hipótese *status quo* (atualmente aceita), geralmente chamada de hipótese Ho
+- A **hipótese nula** é assumida como verdade e precisamos de evidência estatística suficiente para rejeitá-la. 
+- A hipótese que compete com a hipótese nula, é a **hipótese alternativa**.
+
+## Teste de Hipóteses
+
+- As hipóteses alternativas geralmente são aquelas que estabelecem diferenças (diferente, maior, menor) em relação a hipótese nula
+- Existem dois tipos de erro:
+   - Tipo I: quando se rejeita a hipótese nula quando ela é verdadeira
+   - Tipo II: quando não se rejeita a hipótese nula quando ela é falsa
+
+## Teste de Hipóteses
+
+- O limiar para se rejeitar a hipótese nula é chamado de **alfa** (geralmente escolhido em 5%)
+- A probabilidade de rejeitar a hipótese nula quando ela é false é chamado de **poder** 
+- **Valor-p:** Probabilidade de observar um resultado tão extremo quanto o observado, assumindo que a hipótese nula é verdadeira.
+
+
+## Teste de Hipóteses
+
+- Os testes de hipóteses podem ser: **unicaudais** ou **bicaudais**
+- Os testes **unicaudais** presumem apenas uma direção da diferença, enquanto os **bicaudais** presumem ambas (maior ou menor)
+- No caso dos testes **bicaudais**, o alfa é divido entre os dois lados (2.5% maior, 2.5% menor = 5% alfa)
+- Um teste unicaudado com limiar de 5% não é equivalente a 5% bicaudal (!)
+
+## Distribuição T
+
+- Criada por Willian Gosset's em 1908 (pseudônimo de *student*)
+- Adota a premissa de uma distribuição **normal** das variáveis
+- Distribuição paramétrica
+- Entretanto, apresenta **graus de liberdade** que tornam a distrbuição mais grossa nas caudas
+- A medida que o N de observações aumenta, mais ele se aproxima da curva **normal**
+
+## Distribuição T
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+df_tdist <- do.call(cbind, lapply(seq(1, 9, 1), function(x) dt(seq(-3, 3, by = 0.1), df = x)))
+
+colnames(df_tdist) <- paste0('df_', seq(1, 9, 1))
+
+df_tdist %>%
+      as.data.frame() %>%
+      mutate(x = seq(-3, 3, by = 0.1)) %>%
+      pivot_longer(cols = starts_with('df_'),
+                   names_to = 'df_type', 
+                   values_to = 'dt') %>%
+      ggplot(aes(x = x, y = dt, color = df_type)) + 
+      geom_line(size = 2) + 
+      theme_minimal()
+```
+
+## Distribuição T
+
+- Podemos utilizar quando queremos comparar **médias** de amostras
+- Três principais tipos de Teste T:
+   - Pareados - Amostras não indepedentes (*antes* e *depois*)
+   - Independentes com Variância Homogêna 
+   - Independentes com Variância Heterogênea 
+
+## Teste T
+
+- Função ```t.test```no R
+- Argumentos Importantes:
+   - var.equal (se a variância é a mesma entre amostras)
+   - paired (se as amostras são dependentes)
+
+## Teste T
+
+- Comparação de Alturas de Homens e Mulheres
+```{r}
+#| echo = TRUE
+df %>%
+      ggplot(aes(x = SSVV.ALT, color = SEXO)) + 
+      geom_density()
+```
+
+## Teste T
+
+- p-valor menor que 5%, rejeita-se a hipótese nula: as médias entre os dois grupos são diferentes
+
+```{r}
+#| echo = TRUE
+t.test(SSVV.ALT ~ SEXO, data = df, var_equal = FALSE, paired = FALSE)
+```
+
+## Teste T
+
+- Para amostras pareadas, basta assinalar o argumento 'var_qual' para ```TRUE```
+- O padrão da função é considerar a variância entre os grupos diferentes (conservador)
+
+## Comparação de Média de 3 ou mais Amostras
+
+- Para comparação entre dois ou mais grupos, utiliza-se o teste de **ANOVA** (análise de variância)
+- A hipótese nula determina que **não há diferença** de médias entre os grupos
+- A hipótese alternativa determina que pelo menos uma das médias é diferente das outras
+
+## ANOVA
+
+- Checando se há diferença de idade, entre pessoas com IMCs diferentes 
+
+```{r}
+#| echo = TRUE
+df %>%
+      ggplot(aes(x = IDADE, color = SSVV.PESO.BIN)) + 
+      geom_density()
+```
+
+## ANOVA
+
+```{r}
+#| echo = TRUE
+anova <- aov(IDADE ~ SSVV.PESO.BIN, data = df)
+summary(anova)
+```
+
+## ANOVA
+
+- Caso seja observado que uma das amostras é diferente das outras, pode se realizar comparações entre elas, corrigidas por multiplicidades.
+- Esse teste se chama Teste de Tukey
+
+```{r}
+#| echo = TRUE
+TukeyHSD(anova)
+```
+
+## Distribuições Não-Normais
+
+- Em caso de distribuições **não-normais**, deve-se utilizar testes **não-paramétricos** que não assumem uma distribuição das variáveis
+- Esses testes são geralmente baseados em **ranking** (ordenamento de valores)
+- Muitas vezes referem-se a diferença de **medianas**
+
+## Distribuições Não-Normais
+
+- Assim como os testes paramétricos, podem ser pareados ou não pareados
+- Duas Amostras Independentes: Teste de Wilcoxon Rank-Sum Test (Mann-Whitney)
+- Duas Amostras Pareadas: Teste de Wilcoxon (Signed-Rank)
+- Três ou Mais Amostras: Kruskal-Wallis
+
+## Distribuições Não-Normais
+
+- A interpretação desses testes é similar a interpretação dos testes paramétricos
+
+## Teste de Wilcoxon
+
+- Comparação de amostras com distribuição não-normal
+
+```{r}
+df %>%
+      ggplot(aes(x = GEO.CARRO.DISTANCIA/1000, color = SEXO)) + 
+      geom_density() + xlim(0, 50)
+```
+
+## Teste de Wilcoxon
+
+```{r}
+#| echo = TRUE
+wilcox.test(GEO.CARRO.DISTANCIA ~ SEXO, data = df, paired = FALSE)
+```
+
+## Teste de Kruskal Kruskal-Wallis
+
+```{r}
+#| echo = TRUE
+df <- df %>%
+      mutate(IDH_CAT = case_when(
+            GEO.IDH.2010 >= 0.9 ~ 'IDH >= 0.9',
+            GEO.IDH.2010 <= 0.75 ~ 'IDH <= 0.75',
+            TRUE ~ 'IDH > 0.75 E IDH < 0.9'))
+
+```
+
+## Teste de Kruskal Kruskal-Wallis
+
+```{r}
+df %>%
+      ggplot(aes(x = GEO.CARRO.DISTANCIA/1000, color = IDH_CAT)) + 
+      geom_density() + xlim(0, 50)
+```
+
+## Teste de Kruskal Kruskal-Wallis
+
+```{r}
+#| echo = TRUE
+kruskal.test(GEO.CARRO.DISTANCIA ~ IDH_CAT, data = df)
+```
+
+## Outras Alternativas
+
+- Uma alteranativa para testes não paramétricos é a transformação de variáveis em distribuições normais e aplicação de testes paramétricos
+- A transformação na escala logarítmica é comumente utilizada
+
+## Transformação Log
+
+```{r}
+#| echo = TRUE
+df %>%
+      ggplot(aes(x = log(GEO.CARRO.DISTANCIA), color = IDH_CAT)) + 
+      geom_density() + xlim(5, 15)
+
+```
+
+## Transformação Log
+
+```{r}
+#| echo = TRUE
+anova <- aov(log(GEO.CARRO.DISTANCIA) ~ IDH_CAT, data = df)
+summary(anova)
+```
+
+## Transformação Log
+
+```{r}
+#| echo = TRUE
+TukeyHSD(anova)
+```
+
+## Transformação Log
+
+- Uma das maiores limitações da transformação é a interpretação do resultado: diferença de médias da variável testada na escala log
+
+## Conclusões
+
+- Para variáveis normais, o **Teste-T** é usado para comparação de 2 variáveis e a **ANOVA** para 3 ou mais variáveis
+- Para variáveis não-normais, o **Teste Wilcoxon** é usado para comparação de 2 variáveis e o **Kruskal Walis** para 3 ou mais variáveis
+
+## Referências
+
+-   Coursera Data Science Specialization JHU - link\[https://www.coursera.org/specializations/jhu-data-science\]
+-   Fávero, Luiz Paulo, and Patrícia Belfiore. Manual de análise de dados: estatística e modelagem multivariada com Excel®, SPSS® e Stata®. Elsevier Brasil, 2017.
+-   FMM5003 - Princípios de Análise de Dados e de Bioestatística (2023) - Dr. Luiz
